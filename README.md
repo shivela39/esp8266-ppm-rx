@@ -1,6 +1,8 @@
 # esp8266-ppm-rx
 Use an ESP8266 module as a receiver for your drone!
 
+Not fully working yet.
+
 
 ## License
 Released into the public domain via CC0 (see `COPYING` for the license text) EXCEPT for: 
