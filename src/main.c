@@ -72,7 +72,7 @@
 // --- Globals --- //
 // If false, send PPM as normal.
 // If true, PPM pin is kept low to indicate loss of transmitter signal.
-bool failsafe = false;
+static bool failsafe = false;
 // --- ==== --- //
 
 
@@ -179,14 +179,6 @@ void hw_timer_callback(void)
 
 
 // --- WiFi --- //
-// Structure holding the UDP connection information.
-static struct espconn udp_conn;
-
-// UDP specific protocol structure.
-static esp_udp udp_proto;
-
-// ---
-
 static void ICACHE_FLASH_ATTR wifi_event_callback(System_Event_t *event) {
 	switch (event->event) {
 		case EVENT_STAMODE_CONNECTED: {
@@ -205,12 +197,37 @@ static void ICACHE_FLASH_ATTR wifi_event_callback(System_Event_t *event) {
 	}
 }
 
+// ---
+
+static struct espconn ppm_udp_conn;
+static esp_udp ppm_udp_proto;
+
+static void ICACHE_FLASH_ATTR ppm_net_receive_callback(void *arg, char *data, uint16_t len)
+{
+	struct espconn *conn = (struct espconn *)arg;
+}
+
+static void ICACHE_FLASH_ATTR ppm_net_setup(uint32_t port)
+{
+	ppm_udp_proto.local_port = port;
+	
+	ppm_udp_conn.type = ESPCONN_UDP;
+	ppm_udp_conn.state = ESPCONN_NONE;
+	ppm_udp_conn.proto.udp = ppm_udp_proto;
+	
+	espconn_create(&ppm_udp_conn);
+	espconn_regist_recvcb(&udp_conn, recv_cb);
+}
+
+// ---
+
 static void ICACHE_FLASH_ATTR udp_receive_callback(void *arg, char *data, uint16_t len) {
 	struct espconn *conn = (struct espconn *)arg;
 	uint8_t *addr_array = conn->proto.udp->remote_ip;
 }
 
-/*
+// ---
+
 static void ICACHE_FLASH_ATTR wifi_setup(void)
 {
 	wifi_set_opmode_current(STATION_MODE);
@@ -234,7 +251,6 @@ static void ICACHE_FLASH_ATTR wifi_setup(void)
 	espconn_create(&udp_conn);
 	espconn_regist_recvcb(&udp_conn, udp_receive_callback);
 }
-*/
 // --- ==== --- //
 
 
