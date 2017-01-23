@@ -164,7 +164,7 @@ static inline void set_ppm_gpio_level(bool level)
 
 // ---
 
-static inline void update_channels()
+static inline void update_channels(void)
 {
 	for (int i = 0; i < N_CHANNELS; ++i)
 	{
