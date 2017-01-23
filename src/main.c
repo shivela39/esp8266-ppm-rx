@@ -76,72 +76,11 @@ bool failsafe = false;
 // --- ==== --- //
 
 
-// --- WiFi --- //
-// Structure holding the UDP connection information.
-static struct espconn udp_conn;
-
-// UDP specific protocol structure.
-static esp_udp udp_proto;
-
-// ---
-
-static void ICACHE_FLASH_ATTR wifi_event_callback(System_Event_t *event) {
-	switch (event->event) {
-		case EVENT_STAMODE_CONNECTED: {
-		} break;
-
-		case EVENT_STAMODE_DISCONNECTED: {
-		} break;
-
-		case EVENT_STAMODE_GOT_IP: {
-		} break;
-
-		case EVENT_STAMODE_DHCP_TIMEOUT: {
-			wifi_station_disconnect();
-			wifi_station_connect();
-		} break;
-	}
-}
-
-static void ICACHE_FLASH_ATTR udp_receive_callback(void *arg, char *data, uint16_t len) {
-	struct espconn *conn = (struct espconn *)arg;
-	uint8_t *addr_array = conn->proto.udp->remote_ip;
-}
-
-/*
-static void ICACHE_FLASH_ATTR wifi_setup(void)
-{
-	wifi_set_opmode_current(STATION_MODE);
-
-	struct station_config sc;
-	strncpy((char *)sc.ssid, SSID, 32);
-	strncpy((char *)sc.password, PASSWD, 64);
-	sc.bssid_set = 0;
-
-	wifi_station_set_config(&sc);
-	wifi_station_dhcpc_start();
-
-	wifi_set_event_handler_cb(wifi_event_callback);
-
-	// ---
-
-	udp_proto.local_port = 2345;
-	udp_conn.type = ESPCONN_UDP;
-	udp_conn.state = ESPCONN_NONE;
-	udp_conn.proto.udp = &udp_proto;
-	espconn_create(&udp_conn);
-	espconn_regist_recvcb(&udp_conn, udp_receive_callback);
-}
-*/
-// --- ==== --- //
-
-
 // --- PPM --- //
-
-// Modifiable buffer.
+// Channel values. Change these!
 static uint16_t channels[N_CHANNELS] = {0};
 
-// Updated with buffer contents at the end of each PPM frame.
+// Updated with values from `channels` at the end of each PPM frame.
 static uint16_t _channels_us[N_CHANNELS] = {0};
 
 // Current channel we're outputting.
@@ -236,6 +175,66 @@ void hw_timer_callback(void)
 
 	ppm_channel_timer += PPM_RESOLUTION_US;
 }
+// --- ==== --- //
+
+
+// --- WiFi --- //
+// Structure holding the UDP connection information.
+static struct espconn udp_conn;
+
+// UDP specific protocol structure.
+static esp_udp udp_proto;
+
+// ---
+
+static void ICACHE_FLASH_ATTR wifi_event_callback(System_Event_t *event) {
+	switch (event->event) {
+		case EVENT_STAMODE_CONNECTED: {
+		} break;
+
+		case EVENT_STAMODE_DISCONNECTED: {
+		} break;
+
+		case EVENT_STAMODE_GOT_IP: {
+		} break;
+
+		case EVENT_STAMODE_DHCP_TIMEOUT: {
+			wifi_station_disconnect();
+			wifi_station_connect();
+		} break;
+	}
+}
+
+static void ICACHE_FLASH_ATTR udp_receive_callback(void *arg, char *data, uint16_t len) {
+	struct espconn *conn = (struct espconn *)arg;
+	uint8_t *addr_array = conn->proto.udp->remote_ip;
+}
+
+/*
+static void ICACHE_FLASH_ATTR wifi_setup(void)
+{
+	wifi_set_opmode_current(STATION_MODE);
+
+	struct station_config sc;
+	strncpy((char *)sc.ssid, SSID, 32);
+	strncpy((char *)sc.password, PASSWD, 64);
+	sc.bssid_set = 0;
+
+	wifi_station_set_config(&sc);
+	wifi_station_dhcpc_start();
+
+	wifi_set_event_handler_cb(wifi_event_callback);
+
+	// ---
+
+	udp_proto.local_port = 2345;
+	udp_conn.type = ESPCONN_UDP;
+	udp_conn.state = ESPCONN_NONE;
+	udp_conn.proto.udp = &udp_proto;
+	espconn_create(&udp_conn);
+	espconn_regist_recvcb(&udp_conn, udp_receive_callback);
+}
+*/
 // --- ==== --- //
 
 
