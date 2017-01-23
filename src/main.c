@@ -93,7 +93,7 @@ static uint32_t ppm_channel_timer = 0;
 
 static bool ppm_gpio_level = 0;
 
-// Function to avoid writing to the GPIO registers unecessarily.
+// Abstraction to avoid writing to the GPIO registers unecessarily.
 static inline void set_ppm_gpio_level(bool level)
 {
 	if (ppm_gpio_level != level)
