@@ -70,7 +70,9 @@
 
 
 // --- Globals --- //
-bool failsafe = 0;
+// If false, send PPM as normal.
+// If true, PPM pin is kept low to indicate loss of transmitter signal.
+bool failsafe = false;
 // --- ==== --- //
 
 
