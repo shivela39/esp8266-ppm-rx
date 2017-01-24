@@ -3,7 +3,15 @@
 
 
 // --- Include --- //
-#include "hw_timer.h"
+#include <stdint.h>
+#include <limits.h>
+
+#include "ets_sys.h"
+#include "osapi.h"
+#include "gpio.h"
+#include "os_type.h"
+
+#include "driver/hw_timer.h"
 
 #include "fw_config.h"
 #include "ppm.h"

@@ -1,7 +1,7 @@
 NAME = blinky
 
 SOURCE_DIR = src
-INCLUDE_DIRS = $(SOURCE_DIR) $(SOURCE_DIR)/driver
+INCLUDE_DIRS = $(SOURCE_DIR)
 LIBRARIES = 
 
 CC = xtensa-lx106-elf-gcc
