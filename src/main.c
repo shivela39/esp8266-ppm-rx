@@ -2,8 +2,10 @@
 //!
 //! 16 bits per channel, default 8 channels.
 //!
-//! TODO: WiFi. AP or STA?
-//! Modularize, make UDP<->UART module?
+//! TODO: 
+//! - WiFi. AP or STA?
+//! - Modularize, make UDP<->UART module?
+//! - Allow setting of a failsafe position as well as normal failsafe?
 //!
 
 
