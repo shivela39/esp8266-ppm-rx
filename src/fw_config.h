@@ -8,4 +8,7 @@
 // The number of channels to output.
 #define N_CHANNELS 8
 
+// The UDP port to listen on for channel updates.
+#define PPM_PORT 5620
+
 #endif

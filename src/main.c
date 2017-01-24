@@ -33,6 +33,24 @@
 // --- ==== --- //
 
 
+// --- Callbacks --- //
+void ICACHE_FLASH_ATTR net_callback_ppm(void *arg, char *data, unsigned short len)
+{
+	struct espconn *conn = (struct espconn *)arg;
+
+	if (len == N_CHANNELS * sizeof(uint16_t))
+	{
+		uint16_t *data = (uint16_t *)data;
+
+		for (int channel = 0; channel < N_CHANNELS; ++channel)
+		{
+			ppm_set_channel(channel, data[channel]);
+		}
+	}
+}
+// --- ==== --- //
+
+
 // --- Main --- //
 void ICACHE_FLASH_ATTR user_init(void)
 {
@@ -44,6 +62,8 @@ void ICACHE_FLASH_ATTR user_init(void)
 	ppm_init();
 
 	wifi_setup();
+
+	new_udp_listener(PPM_PORT, net_callback_ppm);
 }
 // --- ==== --- //
 
