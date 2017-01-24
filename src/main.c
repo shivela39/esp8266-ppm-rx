@@ -58,6 +58,7 @@ static esp_udp ppm_udp_proto;
 static void ICACHE_FLASH_ATTR ppm_net_receive_callback(void *arg, char *data, uint16_t len)
 {
 	struct espconn *conn = (struct espconn *)arg;
+	uint8_t *addr_array = conn->proto.udp->remote_ip;
 }
 
 static void ICACHE_FLASH_ATTR ppm_net_setup(uint32_t port)
@@ -66,17 +67,10 @@ static void ICACHE_FLASH_ATTR ppm_net_setup(uint32_t port)
 	
 	ppm_udp_conn.type = ESPCONN_UDP;
 	ppm_udp_conn.state = ESPCONN_NONE;
-	ppm_udp_conn.proto.udp = ppm_udp_proto;
+	ppm_udp_conn.proto.udp = &ppm_udp_proto;
 	
 	espconn_create(&ppm_udp_conn);
-	espconn_regist_recvcb(&udp_conn, recv_cb);
-}
-
-// ---
-
-static void ICACHE_FLASH_ATTR udp_receive_callback(void *arg, char *data, uint16_t len) {
-	struct espconn *conn = (struct espconn *)arg;
-	uint8_t *addr_array = conn->proto.udp->remote_ip;
+	espconn_regist_recvcb(&ppm_udp_conn, ppm_net_receive_callback);
 }
 
 // ---
@@ -106,11 +100,10 @@ void ICACHE_FLASH_ATTR user_init(void)
 #endif
 
 	uart_init(BIT_RATE_115200, BIT_RATE_115200);
-
 	ppm_init();
 
-	//wifi_setup();
-	//wifi_set_opmode_current(NULL_MODE);
+	wifi_setup();
+	ppm_net_setup(4460);
 }
 // --- ==== --- //
 
