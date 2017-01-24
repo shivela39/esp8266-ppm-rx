@@ -23,11 +23,12 @@
 #include "espmissingincludes.h"
 
 #include "driver/uart.h"
-#include "driver/hw_timer.h"
 
 #include "fw_config.h"
+#include "../wifi_config.h"
 
 #include "ppm.h"
+
 // --- ==== --- //
 
 
