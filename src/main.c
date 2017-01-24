@@ -42,7 +42,6 @@ void ICACHE_FLASH_ATTR user_init(void)
 	ppm_init();
 
 	wifi_setup();
-	ppm_net_setup(4460);
 }
 // --- ==== --- //
 
