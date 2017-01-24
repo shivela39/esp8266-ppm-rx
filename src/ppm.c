@@ -32,7 +32,7 @@
 
 // --- Other constants --- //
 // If you change this, you also need to change the constant
-// in the call to PIN_FUNC_SELECT in user_main().
+// in the call to PIN_FUNC_SELECT in ppm_init().
 #define PPM_GPIO 2 // TX1
 
 #define PPM_LOW !PPM_HIGH // Logical level of channel width and frame gap.
