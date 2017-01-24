@@ -25,71 +25,9 @@
 #include "driver/uart.h"
 
 #include "fw_config.h"
-#include "../wifi_config.h"
 
 #include "ppm.h"
-
-// --- ==== --- //
-
-
-// --- WiFi --- //
-static void ICACHE_FLASH_ATTR wifi_event_callback(System_Event_t *event) {
-	switch (event->event) {
-		case EVENT_STAMODE_CONNECTED: {
-		} break;
-
-		case EVENT_STAMODE_DISCONNECTED: {
-		} break;
-
-		case EVENT_STAMODE_GOT_IP: {
-		} break;
-
-		case EVENT_STAMODE_DHCP_TIMEOUT: {
-			wifi_station_disconnect();
-			wifi_station_connect();
-		} break;
-	}
-}
-
-// ---
-
-static struct espconn ppm_udp_conn;
-static esp_udp ppm_udp_proto;
-
-static void ICACHE_FLASH_ATTR ppm_net_receive_callback(void *arg, char *data, uint16_t len)
-{
-	struct espconn *conn = (struct espconn *)arg;
-	uint8_t *addr_array = conn->proto.udp->remote_ip;
-}
-
-static void ICACHE_FLASH_ATTR ppm_net_setup(uint32_t port)
-{
-	ppm_udp_proto.local_port = port;
-	
-	ppm_udp_conn.type = ESPCONN_UDP;
-	ppm_udp_conn.state = ESPCONN_NONE;
-	ppm_udp_conn.proto.udp = &ppm_udp_proto;
-	
-	espconn_create(&ppm_udp_conn);
-	espconn_regist_recvcb(&ppm_udp_conn, ppm_net_receive_callback);
-}
-
-// ---
-
-static void ICACHE_FLASH_ATTR wifi_setup(void)
-{
-	wifi_set_opmode_current(STATION_MODE);
-
-	struct station_config sc;
-	strncpy((char *)sc.ssid, SSID, 32);
-	strncpy((char *)sc.password, PASSWD, 64);
-	sc.bssid_set = 0;
-
-	wifi_station_set_config(&sc);
-	wifi_station_dhcpc_start();
-
-	wifi_set_event_handler_cb(wifi_event_callback);
-}
+#include "net.h"
 // --- ==== --- //
 
 
