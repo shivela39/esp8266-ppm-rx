@@ -114,7 +114,6 @@ void ICACHE_FLASH_ATTR uart_rx_task(os_event_t *events) {
 		// Sig 0 is a normal receive. Get how many bytes have been received.
 		uint8_t rx_len = (READ_PERI_REG(UART_STATUS(UART0)) >> UART_RXFIFO_CNT_S) & UART_RXFIFO_CNT;
 
-		// Parse the characters, taking any digits as the new timer interval.
 		uint8_t rx_char;
 		for (uint8_t ii=0; ii < rx_len; ii++) {
 			rx_char = READ_PERI_REG(UART_FIFO(UART0)) & 0xFF;
