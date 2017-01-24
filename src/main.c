@@ -81,7 +81,7 @@ void ICACHE_FLASH_ATTR uart_rx_task(os_event_t *events) {
 			else if (rx_char == 'f')
 			{
 				bool failsafe = !ppm_get_failsafe();
-				ppm_set_failsafe(!failsafe);
+				ppm_set_failsafe(failsafe);
 				os_printf("Failsafe is %s\n", failsafe ? "on" : "off");
 			}
 		}
