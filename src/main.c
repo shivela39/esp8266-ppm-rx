@@ -34,17 +34,17 @@
 
 
 // --- Callbacks --- //
+// 16 bits per channel, big endian (I think).
 void ICACHE_FLASH_ATTR net_callback_ppm(void *arg, char *data, unsigned short len)
 {
 	struct espconn *conn = (struct espconn *)arg;
 
 	if (len == N_CHANNELS * sizeof(uint16_t))
 	{
-		uint16_t *data = (uint16_t *)data;
-
 		for (int channel = 0; channel < N_CHANNELS; ++channel)
 		{
-			ppm_set_channel(channel, data[channel]);
+			uint16_t value = *(data + channel) << 8 | *(data + channel + 1);
+			ppm_set_channel(channel, value);
 		}
 	}
 }
