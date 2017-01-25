@@ -65,7 +65,7 @@ static void ICACHE_FLASH_ATTR wifi_event_callback(System_Event_t *event) {
 // --- Public interface --- //
 void ICACHE_FLASH_ATTR wifi_setup(void)
 {
-	wifi_set_opmode_current(STATION_MODE);
+	wifi_set_opmode(STATION_MODE);
 
 	struct station_config sc;
 	strncpy((char *)sc.ssid, SSID, 32);
