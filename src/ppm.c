@@ -52,7 +52,8 @@ static uint16_t channels[N_CHANNELS] = {0};
 // ---
 
 // Updated with values from `channels` at the end of each PPM frame.
-static uint16_t _channels_us[N_CHANNELS] = {0};
+// Last value is length of frame gap.
+static uint16_t _channels_us[N_CHANNELS + 1] = {0};
 
 // Current channel we're outputting.
 static int current_channel = 0;
@@ -89,6 +90,8 @@ static inline void update_channels(void)
 	{
 		_channels_us[i] = UINT16_TO_CHANNEL_US(channels[i]);
 	}
+
+	_channels_us[N_CHANNELS] = FRAME_GAP_US;
 }
 
 // ---
@@ -118,36 +121,25 @@ void hw_timer_callback(void)
 	}
 	else
 	{
-		if (current_channel != N_CHANNELS + 1) // Normal channel.
+		if (channel_timer < _channels_us[current_channel])
 		{
-			if (channel_timer < _channels_us[current_channel])
-			{
-				// Waiting...
-				set_gpio_level(false);
-			}
-			else // Next channel!
-			{
-				// Begin the pulse immediately.
-				set_gpio_level(true);
+			// Waiting in channel or frame gap low.
+			set_gpio_level(false);
+		}
+		else // Next channel (or new frame)!
+		{
+			// Begin the pulse immediately.
+			set_gpio_level(true);
 
+			if (current_channel != N_CHANNELS) // Normal channel.
+			{
 				current_channel += 1;
 				channel_timer = 0;
 			}
-		}
-		else // Frame gap.
-		{
-			if (channel_timer < FRAME_GAP_US)
+			else // Frame gap.
 			{
-				// We're in the frame gap.
-				set_gpio_level(false);
-			}
-			else // Frame gap is over, new frame!
-			{
-				// Begin the pulse immediately.
-				set_gpio_level(true);
-
 				current_channel = 0;
-				channel_timer = 0;
+				channel_timer = PPM_RESOLUTION_US; // TODO: Why is this needed?
 
 				update_channels();
 			}
@@ -156,7 +148,6 @@ void hw_timer_callback(void)
 
 	failsafe_timer += PPM_RESOLUTION_US;
 	channel_timer += PPM_RESOLUTION_US;
-
 }
 // --- ==== --- //
 
@@ -166,6 +157,8 @@ void ICACHE_FLASH_ATTR ppm_init(void)
 {
 	PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO2_U, FUNC_GPIO2);
 	gpio_output_set(0, 0, (1 << PPM_GPIO), 0);
+
+	update_channels();
 
 	hw_timer_init(FRC1_SOURCE, 1);
 	hw_timer_set_func(hw_timer_callback);
