@@ -53,6 +53,62 @@ void ICACHE_FLASH_ATTR net_callback_ppm(void *arg, char *data, unsigned short le
 // --- ==== --- //
 
 
+// --- Serial bridge --- //
+#define SERIAL_TX_BUFFER_LEN 512
+
+static struct espconn *serial_conn = NULL;
+
+static uint8_t serial_tx_buffer[SERIAL_TX_BUFFER_LEN];
+
+static void ICACHE_FLASH_ATTR net_receive_callback_serial(void *arg, char *data, unsigned short len)
+{
+	struct espconn *conn = (struct espconn *)arg;
+	if (conn == NULL) { return; }
+	
+	uart0_tx_buffer((uint8_t *)data, len);
+}
+
+static void ICACHE_FLASH_ATTR net_disconnect_callback_serial(void *arg)
+{
+	struct espconn *conn = (struct espconn *)arg;
+	serial_conn = NULL;
+}
+
+static void ICACHE_FLASH_ATTR net_connect_callback_serial(void *arg)
+{
+	struct espconn *conn = (struct espconn *)arg;
+	espconn_regist_recvcb(conn, net_receive_callback_serial);
+	espconn_regist_disconcb(conn, net_disconnect_callback_serial);
+	serial_conn = conn;
+}
+
+// ---
+
+void ICACHE_FLASH_ATTR uart_rx_task(os_event_t *events) {
+	if (events->sig == 0) {
+		uint8_t rx_len = (READ_PERI_REG(UART_STATUS(UART0)) >> UART_RXFIFO_CNT_S) 
+			& UART_RXFIFO_CNT;
+		uint16_t buf_i = 0;
+		
+		for (uint8_t ii=0; ii < rx_len; ii++) {
+			serial_tx_buffer[buf_i++] = READ_PERI_REG(UART_FIFO(UART0)) & 0xFF;
+		}
+		
+		if (serial_conn != NULL)
+		{
+			espconn_send(serial_conn, serial_tx_buffer, buf_i);
+		}
+		
+		// ---
+
+		// Clear the interrupt condition flags and re-enable the receive interrupt.
+		WRITE_PERI_REG(UART_INT_CLR(UART0), UART_RXFIFO_FULL_INT_CLR | UART_RXFIFO_TOUT_INT_CLR);
+		uart_rx_intr_enable(UART0);
+	}
+}
+// --- ==== --- //
+
+
 // --- Main --- //
 void ICACHE_FLASH_ATTR user_init(void)
 {
@@ -66,34 +122,6 @@ void ICACHE_FLASH_ATTR user_init(void)
 	wifi_setup();
 
 	new_udp_listener(PPM_PORT, net_callback_ppm);
-}
-// --- ==== --- //
-
-
-// --- UART --- //
-void ICACHE_FLASH_ATTR uart_rx_task(os_event_t *events) {
-	if (events->sig == 0) {
-		// Sig 0 is a normal receive. Get how many bytes have been received.
-		uint8_t rx_len = (READ_PERI_REG(UART_STATUS(UART0)) >> UART_RXFIFO_CNT_S) & UART_RXFIFO_CNT;
-
-		uint8_t rx_char;
-		for (uint8_t ii=0; ii < rx_len; ii++) {
-			rx_char = READ_PERI_REG(UART_FIFO(UART0)) & 0xFF;
-
-			if (rx_char == 's')
-			{
-				for (int channel = 0; channel < N_CHANNELS; ++channel)
-				{
-					uint16_t value = ppm_get_channel(channel);
-					os_printf("%d = %d (%d us)\n",
-						channel, value, UINT16_TO_CHANNEL_US(value));
-				}
-			}
-		}
-
-		// Clear the interrupt condition flags and re-enable the receive interrupt.
-		WRITE_PERI_REG(UART_INT_CLR(UART0), UART_RXFIFO_FULL_INT_CLR | UART_RXFIFO_TOUT_INT_CLR);
-		uart_rx_intr_enable(UART0);
-	}
+	new_tcp_listener(SERIAL_BRIDGE_PORT, net_connect_callback_serial);
 }
 // --- ==== --- //

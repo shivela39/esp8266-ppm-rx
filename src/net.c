@@ -23,7 +23,8 @@
 
 
 // --- Constants --- //
-#define MAX_UDP_LISTENERS 2
+#define MAX_UDP_LISTENERS 1
+#define MAX_TCP_LISTENERS 1
 // --- ==== --- //
 
 
@@ -32,12 +33,20 @@ struct udp_listener {
 	struct espconn conn;
 	esp_udp proto;
 };
+
+struct tcp_listener {
+	struct espconn conn;
+	esp_tcp proto;
+};
 // --- ==== --- //
 
 
 // --- "Globals" --- //
-int next_udp_listener;
+int next_udp_listener = 0;
 struct udp_listener udp_listeners[MAX_UDP_LISTENERS];
+
+int next_tcp_listener = 0;
+struct tcp_listener tcp_listeners[MAX_TCP_LISTENERS];
 // --- ==== --- //
 
 
@@ -95,6 +104,28 @@ bool ICACHE_FLASH_ATTR new_udp_listener(uint32_t port, espconn_recv_callback cal
 
 	espconn_create(&udp_listeners[id].conn);
 	espconn_regist_recvcb(&udp_listeners[id].conn, callback);
+
+	return true;
+}
+
+bool ICACHE_FLASH_ATTR new_tcp_listener(uint32_t port,
+	espconn_connect_callback connect_callback)
+{
+	if (next_tcp_listener == MAX_TCP_LISTENERS)
+	{
+		return false;
+	}
+
+	int id = next_tcp_listener++;
+
+	tcp_listeners[id].proto.local_port = port;
+
+	tcp_listeners[id].conn.type = ESPCONN_TCP;
+	tcp_listeners[id].conn.state = ESPCONN_NONE;
+	tcp_listeners[id].conn.proto.tcp = &tcp_listeners[id].proto;
+	
+	espconn_regist_connectcb(&tcp_listeners[id].conn, connect_callback);
+	espconn_accept(&tcp_listeners[id].conn);
 
 	return true;
 }
