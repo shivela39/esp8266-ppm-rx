@@ -3,7 +3,6 @@
 //! 16 bits per channel, default 8 channels.
 //!
 //! TODO:
-//! - Make UART bridge for telemetry.
 //! - Allow setting of a failsafe position as well as normal failsafe?
 //!
 
