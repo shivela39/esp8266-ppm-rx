@@ -116,6 +116,9 @@ void hw_timer_callback(void)
 	// The final channel is followed by another 0.3ms pulse, then the frame gap.
 	// We can think of the frame gap as just a really long channel.
 
+	// FIXME: Sometimes channel one is a few timer cycles too long.
+	// I don't know why.
+
 	if (channel_timer < PULSE_US) // Start-of-channel pulse.
 	{
 		set_gpio_level(true);
@@ -140,7 +143,7 @@ void hw_timer_callback(void)
 			else // Frame gap.
 			{
 				current_channel = 0;
-				channel_timer = PPM_RESOLUTION_US; // TODO: Why is this needed?
+				channel_timer = 0;
 
 				update_channels();
 			}
