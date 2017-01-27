@@ -46,10 +46,6 @@
 
 
 // --- "Globals" --- //
-// If false, send PPM as normal.
-// If true, PPM pin is kept low to indicate loss of transmitter signal.
-static bool failsafe = false;
-
 // Channel values. Change these!
 static uint16_t channels[N_CHANNELS] = {0};
 
@@ -63,6 +59,12 @@ static int current_channel = 0;
 
 // How long we've been outputting this channel, in microseconds.
 static uint32_t channel_timer = 0;
+
+// ---
+
+// How long we've been going since last `ppm_reset_failsafe()`.
+// If this is >= FAILSAFE_TIMEOUT_US, failsafe is active.
+static uint32_t failsafe_timer = 0;
 // --- ==== --- //
 
 
@@ -93,15 +95,21 @@ static inline void update_channels(void)
 
 void hw_timer_callback(void)
 {
-	if (failsafe)
+	if (failsafe_timer >= FAILSAFE_TIMEOUT_US) 
 	{
+		// Failsafe!
 		set_gpio_level(false);
+
 		current_channel = 0;
 		channel_timer = 0;
+
 		return;
 	}
 	
 	// ---
+		
+	failsafe_timer += PPM_RESOLUTION_US;
+	channel_timer += PPM_RESOLUTION_US;
 	
 	// Each channel has a 0.3ms pulse, followed by 0.7-1.7 ms.
 	// The final channel is followed by another 0.3ms pulse, then the frame gap.
@@ -150,8 +158,6 @@ void hw_timer_callback(void)
 			}
 		}
 	}
-
-	channel_timer += PPM_RESOLUTION_US;
 }
 // --- ==== --- //
 
@@ -167,14 +173,14 @@ void ICACHE_FLASH_ATTR ppm_init(void)
 	hw_timer_arm(PPM_RESOLUTION_US);
 }
 
-bool ppm_get_failsafe(void)
+void ppm_reset_failsafe(void)
 {
-	return failsafe;
+	failsafe_timer = 0;
 }
 
-void ppm_set_failsafe(bool b)
+void ppm_force_failsafe(void)
 {
-	failsafe = b;
+	failsafe_timer = FAILSAFE_TIMEOUT_US;
 }
 
 uint16_t ppm_get_channel(int channel)

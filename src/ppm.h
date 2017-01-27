@@ -15,8 +15,8 @@
 // --- Function declarations --- //
 void ICACHE_FLASH_ATTR ppm_init(void);
 bool ppm_get_failsafe(void);
-void ppm_set_failsafe(bool b);
-uint16_t ppm_get_channel(int channel);
+void ppm_reset_failsafe(void);
+void ppm_force_failsafe(void);
 void ppm_set_channel(int channel, uint16_t value);
 // --- ==== --- //
 

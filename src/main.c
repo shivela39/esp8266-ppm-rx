@@ -3,8 +3,7 @@
 //! 16 bits per channel, default 8 channels.
 //!
 //! TODO: 
-//! - Make UDP<->UART section.
-//! - Failsafe on a timeout.
+//! - Make UART bridge for telemetry.
 //! - Allow setting of a failsafe position as well as normal failsafe?
 //!
 
@@ -33,7 +32,7 @@
 // --- ==== --- //
 
 
-// --- Callbacks --- //
+// --- PPM --- //
 // 16 bits per channel, big endian (I think).
 void ICACHE_FLASH_ATTR net_callback_ppm(void *arg, char *data, unsigned short len)
 {
@@ -41,6 +40,8 @@ void ICACHE_FLASH_ATTR net_callback_ppm(void *arg, char *data, unsigned short le
 
 	if (len == N_CHANNELS * sizeof(uint16_t))
 	{
+		ppm_reset_failsafe();
+
 		for (int channel = 0; channel < N_CHANNELS; ++channel)
 		{
 			uint16_t value = *(data + channel) << 8 | *(data + channel + 1);
@@ -77,33 +78,6 @@ void ICACHE_FLASH_ATTR uart_rx_task(os_event_t *events) {
 		uint8_t rx_char;
 		for (uint8_t ii=0; ii < rx_len; ii++) {
 			rx_char = READ_PERI_REG(UART_FIFO(UART0)) & 0xFF;
-			
-			if (rx_char == 's')
-			{
-				uint16_t value;
-				os_printf("Channels:\n");
-				for (int i = 0; i < N_CHANNELS; ++i)
-				{
-					value = ppm_get_channel(i);
-					os_printf("  %d = %d (%d us)\n", i, value, UINT16_TO_CHANNEL_US(value));
-				}
-			}
-			else if (rx_char == 'r')
-			{
-				const int i = 2;
-				
-				uint16_t new_value = os_random() / (ULONG_MAX/UINT16_MAX);
-				
-				ppm_set_channel(i, new_value);
-				os_printf("Changed channel %d to %d (%d us)\n", i, 
-					new_value, UINT16_TO_CHANNEL_US(new_value));
-			}
-			else if (rx_char == 'f')
-			{
-				bool failsafe = !ppm_get_failsafe();
-				ppm_set_failsafe(failsafe);
-				os_printf("Failsafe is %s\n", failsafe ? "on" : "off");
-			}
 		}
 
 		// Clear the interrupt condition flags and re-enable the receive interrupt.
