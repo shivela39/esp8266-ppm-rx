@@ -17,9 +17,9 @@ CFLAGS += -mlongcalls -DICACHE_FLASH
 LDLIBS += -nostdlib -Wl,--start-group -lmain -lnet80211 -lwpa -llwip -lpp -lphy -lcirom -Wl,--end-group -lgcc
 LDFLAGS += -Teagle.app.v6.ld
 
-ESPTOOL_BAUD = 921600
-ESPTOOL_PORT = /dev/ttyUSB0
-ESPTOOL_FLASH_FLAGS =
+ESPTOOL_BAUD ?= 115200
+ESPTOOL_PORT ?= /dev/ttyUSB0
+ESPTOOL_FLASH_FLAGS ?=
 
 # ---
 
