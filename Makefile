@@ -27,6 +27,7 @@ ESPTOOL_FLAGS += --port $(ESPTOOL_PORT) --baud $(ESPTOOL_BAUD)
 # ---
 
 SOURCES = $(wildcard $(SOURCE_DIR)/*.c) $(wildcard $(SOURCE_DIR)/driver/*.c)
+HEADERS = $(wildcard $(SOURCE_DIR)/*.h) $(wildcard $(SOURCE_DIR)/driver/*.h)
 OBJECTS = ${SOURCES:.c=.o}
 
 CPPFLAGS += $(foreach includedir,$(INCLUDE_DIRS),-I$(includedir))
@@ -41,7 +42,7 @@ all: $(NAME)
 
 # --
 
-$(NAME): $(OBJECTS)
+$(NAME): $(OBJECTS) $(HEADERS) Makefile
 	$(LINK.c) $(OBJECTS) $(LDLIBS) -o $(NAME)
 
 # --
