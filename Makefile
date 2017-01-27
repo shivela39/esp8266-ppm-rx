@@ -9,6 +9,7 @@ CC = xtensa-lx106-elf-gcc
 CPPFLAGS +=
 
 CFLAGS += -std=c11
+CFLAGS += -O2
 CFLAGS += -Wall -Werror
 CFLAGS += -Wno-unused-variable -Wno-unused-but-set-variable -Wno-unused-value -Wno-unused-function
 CFLAGS += -Wno-implicit-function-declaration
