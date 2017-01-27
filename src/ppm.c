@@ -118,27 +118,7 @@ void hw_timer_callback(void)
 	}
 	else
 	{
-		if (current_channel == N_CHANNELS + 1) // Frame gap.
-		{
-			// We add PULSE_US because the frame gap is the part
-			// after the pulse.
-			if (channel_timer < PULSE_US + FRAME_GAP_US)
-			{
-				// We're in the frame gap.
-				set_gpio_level(false);
-			}
-			else // Frame gap is over, new frame!
-			{
-				// Begin the pulse immediately.
-				set_gpio_level(true);
-
-				current_channel = 0;
-				channel_timer = 0;
-
-				update_channels();
-			}
-		}
-		else // Normal channel.
+		if (current_channel != N_CHANNELS + 1) // Normal channel.
 		{
 			if (channel_timer < _channels_us[current_channel])
 			{
@@ -152,6 +132,24 @@ void hw_timer_callback(void)
 
 				current_channel += 1;
 				channel_timer = 0;
+			}
+		}
+		else // Frame gap.
+		{
+			if (channel_timer < FRAME_GAP_US)
+			{
+				// We're in the frame gap.
+				set_gpio_level(false);
+			}
+			else // Frame gap is over, new frame!
+			{
+				// Begin the pulse immediately.
+				set_gpio_level(true);
+
+				current_channel = 0;
+				channel_timer = 0;
+
+				update_channels();
 			}
 		}
 	}
