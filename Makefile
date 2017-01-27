@@ -18,8 +18,10 @@ LDLIBS += -nostdlib -Wl,--start-group -lmain -lnet80211 -lwpa -llwip -lpp -lphy 
 LDFLAGS += -Teagle.app.v6.ld
 
 ESPTOOL_BAUD ?= 115200
-ESPTOOL_PORT ?= /dev/ttyUSB0
-ESPTOOL_FLASH_FLAGS ?=
+ESPTOOL_PORT ?= /dev/ttyACM0
+ESPTOOL_FLAGS ?= --before no_reset --after soft_reset
+
+ESPTOOL_FLAGS += --port $(ESPTOOL_PORT) --baud $(ESPTOOL_BAUD)
 
 # ---
 
@@ -47,13 +49,13 @@ $(NAME)-0x00000.bin: $(NAME)
 	esptool.py elf2image $<
 	
 flash: $(NAME)-0x00000.bin
-	esptool.py --port $(ESPTOOL_PORT) --baud $(ESPTOOL_BAUD) \
-		write_flash $(ESPTOOL_FLASH_FLAGS) \
+	esptool.py $(ESPTOOL_FLAGS) \
+		write_flash \
 		0x00000 $(NAME)-0x00000.bin 0x10000 $(NAME)-0x10000.bin
 
 flash-reset: $(NAME)-0x00000.bin
-	esptool.py --port $(ESPTOOL_PORT) --baud $(ESPTOOL_BAUD) \
-		write_flash $(ESPTOOL_FLASH_FLAGS) \
+	esptool.py $(ESPTOOL_FLAGS) \
+		write_flash \
 		0x00000 $(NAME)-0x00000.bin 0x10000 $(NAME)-0x10000.bin \
 		0xFC000 esp_init_data_default.bin 0xFE000 blank.bin
 		
