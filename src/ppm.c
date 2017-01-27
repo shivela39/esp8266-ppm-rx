@@ -65,7 +65,8 @@ static uint32_t channel_timer = 0;
 
 // How long we've been going since last `ppm_reset_failsafe()`.
 // If this is >= FAILSAFE_TIMEOUT_US, failsafe is active.
-static uint32_t failsafe_timer = 0;
+// Start in failsafe for safety.
+static uint32_t failsafe_timer = FAILSAFE_TIMEOUT_US;
 // --- ==== --- //
 
 
