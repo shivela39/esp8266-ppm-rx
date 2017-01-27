@@ -116,7 +116,7 @@ void hw_timer_callback(void)
 	{
 		set_gpio_level(true);
 	}
-	else // Channel wait (or frame gap).
+	else
 	{
 		if (current_channel == N_CHANNELS + 1) // Frame gap.
 		{
