@@ -59,6 +59,9 @@ flash-reset: $(NAME)-0x00000.bin
 		0x00000 $(NAME)-0x00000.bin 0x10000 $(NAME)-0x10000.bin \
 		0xFC000 esp_init_data_default.bin 0xFE000 blank.bin
 		
+run:
+	esptool.py $(ESPTOOL_FLAGS) run
+
 term:
 	miniterm.py -p $(ESPTOOL_PORT) -b 115200
 	
