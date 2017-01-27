@@ -95,7 +95,7 @@ static inline void update_channels(void)
 
 void hw_timer_callback(void)
 {
-	if (failsafe_timer >= FAILSAFE_TIMEOUT_US) 
+	if (failsafe_timer >= FAILSAFE_TIMEOUT_US)
 	{
 		// Failsafe!
 		set_gpio_level(false);
@@ -105,12 +105,9 @@ void hw_timer_callback(void)
 
 		return;
 	}
-	
+
 	// ---
-		
-	failsafe_timer += PPM_RESOLUTION_US;
-	channel_timer += PPM_RESOLUTION_US;
-	
+
 	// Each channel has a 0.3ms pulse, followed by 0.7-1.7 ms.
 	// The final channel is followed by another 0.3ms pulse, then the frame gap.
 	// We can think of the frame gap as just a really long channel.
@@ -158,6 +155,10 @@ void hw_timer_callback(void)
 			}
 		}
 	}
+
+	failsafe_timer += PPM_RESOLUTION_US;
+	channel_timer += PPM_RESOLUTION_US;
+
 }
 // --- ==== --- //
 
@@ -167,7 +168,7 @@ void ICACHE_FLASH_ATTR ppm_init(void)
 {
 	PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO2_U, FUNC_GPIO2);
 	gpio_output_set(0, 0, (1 << PPM_GPIO), 0);
-	
+
 	hw_timer_init(FRC1_SOURCE, 1);
 	hw_timer_set_func(hw_timer_callback);
 	hw_timer_arm(PPM_RESOLUTION_US);

@@ -2,7 +2,7 @@
 //!
 //! 16 bits per channel, default 8 channels.
 //!
-//! TODO: 
+//! TODO:
 //! - Make UART bridge for telemetry.
 //! - Allow setting of a failsafe position as well as normal failsafe?
 //!
@@ -44,7 +44,8 @@ void ICACHE_FLASH_ATTR net_callback_ppm(void *arg, char *data, unsigned short le
 
 		for (int channel = 0; channel < N_CHANNELS; ++channel)
 		{
-			uint16_t value = *(data + channel) << 8 | *(data + channel + 1);
+			int channel_offset = channel * sizeof(uint16_t);
+			uint16_t value = *(data + channel_offset) << 8 | *(data + channel_offset + 1);
 			ppm_set_channel(channel, value);
 		}
 	}
@@ -78,6 +79,16 @@ void ICACHE_FLASH_ATTR uart_rx_task(os_event_t *events) {
 		uint8_t rx_char;
 		for (uint8_t ii=0; ii < rx_len; ii++) {
 			rx_char = READ_PERI_REG(UART_FIFO(UART0)) & 0xFF;
+
+			if (rx_char == 's')
+			{
+				for (int channel = 0; channel < N_CHANNELS; ++channel)
+				{
+					uint16_t value = ppm_get_channel(channel);
+					os_printf("%d = %d (%d us)\n",
+						channel, value, UINT16_TO_CHANNEL_US(value));
+				}
+			}
 		}
 
 		// Clear the interrupt condition flags and re-enable the receive interrupt.
