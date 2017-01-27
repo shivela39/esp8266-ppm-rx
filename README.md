@@ -3,6 +3,8 @@ Use an ESP8266 module as a receiver for your drone!
 
 This firmware has two main features: UDP-to-PPM for remote control, and a serial bridge for telemetry.
 
+WARNING: It is quite possible that this firmware has bugs in it! I can't guarantee the safety of whatever you use this on. Be careful!
+
 
 ## Configuration
 
