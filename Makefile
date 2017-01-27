@@ -42,7 +42,7 @@ all: $(NAME)
 
 # --
 
-$(NAME): $(OBJECTS) $(HEADERS) Makefile
+$(NAME): $(OBJECTS) $(HEADERS)
 	$(LINK.c) $(OBJECTS) $(LDLIBS) -o $(NAME)
 
 # --
