@@ -36,6 +36,8 @@ WARNING: It is quite possible that this firmware has fatal bugs in it! I can't g
 ### PPM
 By default, the firmware listens on UDP port 5620 for PPM channel data. Each channel's value is represented by two bytes (16 bits) big endian, so a PPM update is a single packet of `N_CHANNELS * 2` bytes, with channel one's value being the first two bytes, channel two the next two bytes, and so on.
 
+By default, PPM is output on GPIO2/TX1. This is adjustable in `src/ppm.c` (find `PPM_GPIO`).
+
 ### Serial bridge
 By default, the firmware listens on TCP port 5621. The connection is just a completely transparent serial bridge at 115200 baud. I use this for remote telemetry.
 
