@@ -169,6 +169,11 @@ void ICACHE_FLASH_ATTR ppm_init(void)
 	hw_timer_arm(PPM_RESOLUTION_US);
 }
 
+bool ppm_get_failsafe(void)
+{
+	return (failsafe_timer >= FAILSAFE_TIMEOUT_US);
+}
+
 void ppm_reset_failsafe(void)
 {
 	failsafe_timer = 0;

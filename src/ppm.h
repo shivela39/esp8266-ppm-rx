@@ -13,10 +13,22 @@
 
 
 // --- Function declarations --- //
+/// Intialize and start the PPM system.
 void ICACHE_FLASH_ATTR ppm_init(void);
+
+/// Get whether failsafe is active.
 bool ppm_get_failsafe(void);
+
+/// Clear failsafe and reset timeout timer.
 void ppm_reset_failsafe(void);
+
+/// Enable failsafe immediately.
 void ppm_force_failsafe(void);
+
+/// Get a channel's current value.
+uint16_t ppm_get_channel(int channel);
+
+/// Set a channel to a value.
 void ppm_set_channel(int channel, uint16_t value);
 // --- ==== --- //
 
