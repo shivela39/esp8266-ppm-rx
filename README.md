@@ -16,7 +16,7 @@ WARNING: It is quite possible that this firmware has fatal bugs in it! I can't g
 ```
 
 - Check out `src/fw_config.h` for some configuration options.
-- PPM timing details are in `ppm.c` You probably don't need to change them, but they're there.
+- PPM timing details are in `src/ppm.c` You probably don't need to change them, but they're there.
 
 
 ## Building
