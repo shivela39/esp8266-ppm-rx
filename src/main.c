@@ -116,6 +116,9 @@ void ICACHE_FLASH_ATTR user_init(void)
 	system_update_cpu_freq(160);
 #endif
 
+	// I hope this disables debug output.
+	system_set_os_print(0);
+
 	uart_init(BIT_RATE_115200, BIT_RATE_115200);
 	ppm_init();
 
