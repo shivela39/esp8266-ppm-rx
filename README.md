@@ -38,6 +38,11 @@ By default, the firmware listens on UDP port 5620 for PPM channel data. Each cha
 
 By default, PPM is output on GPIO2/TX1. This is adjustable in `src/ppm.c` (find `PPM_GPIO`).
 
+#### Failsafe
+
+For safety, there is a failsafe. If there hasn't been a UDP channel update message in 500 milliseconds, the firmware stops transmitting PPM, indicating a loss of signal (timeout is configurable, see `FAILSAFE_TIMEOUT_US` in `src/fw_config.h`).
+
+
 ### Serial bridge
 By default, the firmware listens on TCP port 5621. The connection is just a completely transparent serial bridge at 115200 baud. I use this for remote telemetry.
 
