@@ -22,7 +22,7 @@
 // Logical level of the PPM pulses.
 #define PPM_HIGH 1
 
-// The length of the pulse terminating a frame.
+// The length of the pulse + gap terminating a frame.
 #define FRAME_GAP_US 4000
 
 // The length of a pulse between channels.
