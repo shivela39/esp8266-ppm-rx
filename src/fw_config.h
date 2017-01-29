@@ -16,6 +16,6 @@
 
 // Switch to failsafe after this many microseconds of not receiving a valid message.
 // Call `ppm_reset_failsafe()` to reset the timer and cancel failsafe.
-#define FAILSAFE_TIMEOUT_US (500 * 1000)
+#define FAILSAFE_TIMEOUT_US (25 * 1000)
 
 #endif
