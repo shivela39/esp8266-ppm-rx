@@ -1,4 +1,4 @@
-NAME = blinky
+NAME = esp8266-ppm-rx
 
 SOURCE_DIR = src
 INCLUDE_DIRS = $(SOURCE_DIR)
