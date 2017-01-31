@@ -67,40 +67,43 @@ function love.load()
 	
 	---
 	
-	joystick = love.joystick.getJoysticks()[1]
+	local joysticks = love.joystick.getJoysticks()
 	
-	if joystick then
-		print("Using: " .. joystick:getName())
-	else
+	for i, js in ipairs(joysticks) do
+		if js:getName() ~= "AeroQuad AQ32" then
+			joystick = js
+			print("Using: " .. js:getName())
+			break
+		end
+	end
+	
+	if not joystick then
 		print("No joystick found!")
 		love.event.quit() 
 	end
 	
 	---
 	
-	client = socket.udp()
-	client:settimeout(1)
+	client = assert(socket.udp())
+	assert(client:settimeout(1))
 	
-	client:setpeername(PPM_IP, PPM_PORT)
+	assert(client:setpeername(PPM_IP, PPM_PORT))
 end
 
 function love.update(dt)
+	text = ""
 	local channels = {}
-	local input_roll, input_pitch, input_yaw, input_throttle = joystick:getAxes()
+	local inputs = { joystick:getAxes() }
 	
 	---
 	
-	text = ("Throttle: %.2f\nRoll: %.2f\nPitch: %.2f\nYaw: %.2f")
-		:format(zeromid_to_zerolow(-input_throttle), input_roll, input_pitch, input_yaw)
+	for i = 1, 8 do
+		channels[i] = inputs[i] or 0
+	end
 	
-	channels[1] = -input_throttle
-	channels[2] = input_roll
-	channels[3] = input_pitch
-	channels[4] = input_yaw
-	channels[5] = 0
-	channels[6] = 0
-	channels[7] = 0
-	channels[8] = 0
+	for i, input in ipairs(inputs) do
+		text = text .. ("%d : %.3f\n"):format(i, input)
+	end
 	
 	---
 	
@@ -108,18 +111,18 @@ function love.update(dt)
 		local n, err = client:send(channels_to_bytes(channels))
 
 		if n then
-			text = text .. "\nOK"
+			text = text .. "OK"
 		else
-			text = text .. "\nError: " .. err
+			text = text .. "Error: " .. err
 		end
 	else
-		text = text .. "\nFAILSAFE"
+		text = text .. "FAILSAFE"
 	end
 end
 
 function love.focus(f)
 	if not f then
-		failsafe = true
+		--failsafe = true
 	end
 end
 
